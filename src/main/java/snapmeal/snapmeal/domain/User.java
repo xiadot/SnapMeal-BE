@@ -8,17 +8,18 @@ import lombok.NoArgsConstructor;
 import snapmeal.snapmeal.domain.common.BaseEntity;
 import snapmeal.snapmeal.domain.enums.Gender;
 
-import java.math.BigInteger;
+
 import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "`user`")
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger id;
+    private Long id;
 
     @Column(nullable = false ,length = 255)
     private String username;
@@ -30,6 +31,7 @@ public class User extends BaseEntity {
 
     private String nickname;
 
+    @Column(nullable = true, unique = true)
     private String email;
 
     private Integer age;

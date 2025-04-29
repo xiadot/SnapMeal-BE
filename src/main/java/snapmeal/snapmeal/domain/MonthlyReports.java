@@ -3,7 +3,7 @@ package snapmeal.snapmeal.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.userdetails.User;
+
 import snapmeal.snapmeal.domain.common.BaseEntity;
 
 import java.time.LocalDate;
