@@ -1,4 +1,7 @@
 spring:
+  docker:
+    compose:
+      enabled: false
   mvc:
     servlet:
       encoding:
@@ -10,22 +13,22 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: ${URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
+    url: jdbc:mysql://localhost:3306/snapmeal
+    username: root
+    password: jybtob0321^^
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
       mode: never
   jpa:
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         show_sql: true
         format_sql: true
         use_sql_comments: true
-        hbm2ddl:
-          auto: create
         default_batch_fetch_size: 1000
 #  cloud:
 #    aws:
@@ -62,4 +65,5 @@ spring:
       #host: redis-container
       host: localhost
       port: 6379
+
 
