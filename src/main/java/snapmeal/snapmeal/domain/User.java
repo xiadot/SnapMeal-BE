@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import snapmeal.snapmeal.domain.common.BaseEntity;
 import snapmeal.snapmeal.domain.enums.Gender;
+import snapmeal.snapmeal.domain.enums.Role;
+import snapmeal.snapmeal.web.dto.UserRequestDto;
 
 
 import java.util.List;
@@ -21,24 +23,32 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false ,length = 255)
+    @Column(nullable = true)
     private String username;
 
-    @Column(nullable = false ,length = 255)
+    @Column(nullable = true, length = 255)
     private String password;
-    private String kakaoId;
 
 
+    private Role role;
+
+    @Column(nullable = true, length = 255)
     private String nickname;
 
     @Column(nullable = true, unique = true)
     private String email;
 
+    @Column(nullable = true, length = 255)
     private Integer age;
 
+    @Column(nullable = true, length = 255)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(nullable = true, length = 255)
+    private String type;
+
+    @Column(nullable = true, length = 255)
     private String profile_image;
 
     @OneToMany(mappedBy = "user")
@@ -68,5 +78,27 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<WeeklyReports> weeklyReports;
+
+    public void updateAll(UserRequestDto.JoinDto dto) {
+        if (dto.getName() != null) {
+            this.username = dto.getName(); // name → username 매핑
+        }
+        if (dto.getAge() != null) {
+            this.age = dto.getAge();
+        }
+        if (dto.getGender() != null) {
+            this.gender = dto.getGender();
+        }
+        if (dto.getEmail() != null) {
+            this.email = dto.getEmail();
+        }
+        if (dto.getNickname() != null) {
+            this.nickname = dto.getNickname();
+        }
+        if (dto.getType() != null) {
+            this.type = dto.getType();
+        }
+    }
+
 
 }

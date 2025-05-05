@@ -1,4 +1,6 @@
 spring:
+  kakao:
+    client-id: ${Client_ID}
   docker:
     compose:
       enabled: false

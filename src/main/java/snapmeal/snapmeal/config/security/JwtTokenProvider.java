@@ -1,6 +1,8 @@
 package snapmeal.snapmeal.config.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,33 +15,42 @@ import snapmeal.snapmeal.domain.User;
 import snapmeal.snapmeal.repository.RefreshTokenRepository;
 import snapmeal.snapmeal.web.dto.TokenServiceResponse;
 import io.jsonwebtoken.SignatureException;
+
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
 @RequiredArgsConstructor
 @Component
 @Slf4j
+
 public class JwtTokenProvider {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserDetailsService userDetailsService;
+
+    private Key key;
 
     @Value("${jwt.secret}")
     private String secretKey;
-    //    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60; 	//1시간
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24; // 1일
-    private final UserDetailsService userDetailsService;
 
-    // JWT 생성 (이메일 포함)
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
+
     public TokenServiceResponse createToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
-
         Date now = new Date();
 
         String accessToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         String refreshToken = Jwts.builder()
@@ -47,9 +58,8 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME))
                 .claim("random", UUID.randomUUID().toString())
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
 
         long expiration = getExpiration(refreshToken);
         refreshTokenRepository.saveToken(user.getId(), refreshToken, expiration);
@@ -59,38 +69,39 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
-            log.warn("JWT Token expired: {}", e.getMessage());
+            System.out.println("JWT Token expired: " + e.getMessage());
         } catch (UnsupportedJwtException e) {
-            log.warn("Unsupported JWT Token: {}", e.getMessage());
+            System.out.println("Unsupported JWT Token: " + e.getMessage());
         } catch (MalformedJwtException e) {
-            log.warn("Malformed JWT Token: {}", e.getMessage());
+            System.out.println("Malformed JWT Token: " + e.getMessage());
         } catch (SignatureException e) {
-            log.warn("Invalid JWT signature: {}", e.getMessage());
+            System.out.println("Invalid JWT signature: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            log.warn("JWT claims string is empty: {}", e.getMessage());
+            System.out.println("JWT claims string is empty: " + e.getMessage());
         }
         return false;
     }
 
     public boolean isTokenExpired(String token) {
         try {
-            Date expiration = Jwts.parser()
-                    .setSigningKey(secretKey)
+            Date expiration = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .getExpiration();
-            return expiration.before(new Date()); // 현재 시간보다 이전이면 만료됨
+            return expiration.before(new Date());
         } catch (ExpiredJwtException e) {
-            return true; // 이미 만료된 토큰
+            return true;
         }
     }
 
     public String getEmailFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -99,20 +110,20 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         String email = getEmailFromToken(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email); // 이메일로 사용자 로드
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public long getExpiration(String token) {
         try {
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
+                    .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
             return claims.getExpiration().getTime() - System.currentTimeMillis();
         } catch (ExpiredJwtException e) {
-            return 0; // 이미 만료된 경우 0 반환
+            return 0;
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid JWT Token");
         }
