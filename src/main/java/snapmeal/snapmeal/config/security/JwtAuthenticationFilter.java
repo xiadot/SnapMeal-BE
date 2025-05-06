@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(anonymousAuth);
             }
         } catch (Exception ex) {
-            System.out.println("Exception in JwtAuthenticationFilter: " + ex.getMessage());
+
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Internal server error occurred.");
         }
@@ -71,7 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-        System.out.println("Authorization header is missing or does not start with 'Bearer '.");
         return null;
     }
 }

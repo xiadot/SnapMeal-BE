@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import snapmeal.snapmeal.config.security.JwtTokenProvider;
 import snapmeal.snapmeal.converter.UserConverter;
@@ -28,46 +29,47 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlacklistRepository blacklistRepository;
-
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     @Transactional
     public UserResponseDto.UserDto joinUser(UserRequestDto.JoinDto request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        String email = authentication.getName(); // 인증 정보에서 이메일 추출
 
-        // 1. 기존 사용자 조회 또는 새로운 사용자 생성
-        User user = userRepository.findByEmail(email).orElseGet(() -> saveNewUser(email, request));
-
-        // 2. 기존 사용자일 경우 업데이트
-        if (user.getId() != null) {
-            updateUserData(user, request);
-            userRepository.save(user);
-
-        }
+        User user = userRepository.findByEmail(email)
+                .map(existingUser -> {
+                    updateUserData(existingUser, request);
+                    return existingUser;
+                })
+                .orElseGet(() -> {
+                    User newUser = UserConverter.toUser(request,passwordEncoder);
+                    return userRepository.save(newUser);
+                });
 
         return UserConverter.toUserSignUpResponseDto(user);
     }
 
+
+
     @Override
-    public User saveNewUser(String email, UserRequestDto.JoinDto request) {
-        return userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .email(request.getEmail())
-                            .username(request.getName()) // name → username 매핑
-                            .age(request.getAge())
-                            .gender(request.getGender())
-                            .nickname(request.getNickname())
-                            .type(request.getType())
-                            .role(Role.USER) // 기본 권한 직접 지정
-                            .build();
+    public UserResponseDto.LoginDto saveNewUser(UserRequestDto.JoinDto request) {
 
 
-                    return userRepository.save(newUser);
-                });
+        User user = UserConverter.toUser(request, passwordEncoder);
+        userRepository.save(user);
+
+        TokenServiceResponse token = jwtTokenProvider.createToken(user);
+
+        return UserResponseDto.LoginDto.builder()
+                .tokenServiceResponse(token)
+                .isNewUser(true)
+                .build();
     }
+
+
+
 
     @Override
     public UserResponseDto.LoginDto isnewUser(String email) {
@@ -87,7 +89,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         }
         // 신규 유저 생성
         User newUser = User.builder()
-                .email(email)// 기본값 설정
+                .email(email)
                 .role(Role.USER)
                 .build();
 

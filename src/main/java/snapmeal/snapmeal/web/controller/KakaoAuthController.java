@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
-@RequestMapping("/api/oauth/kakao")
+@RequestMapping("/users/oauth/kakao")
 @Tag(name = "카카오 로그인", description = "카카오 소셜 로그인 API")
 public class KakaoAuthController {
 

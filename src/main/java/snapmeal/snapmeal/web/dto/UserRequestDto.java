@@ -15,6 +15,8 @@ public class UserRequestDto {
         Integer age;
         Gender gender;
         String email;
+        String userId;
+        String password;
         String nickname;
         String type;
     }

@@ -6,7 +6,8 @@ import snapmeal.snapmeal.web.dto.UserRequestDto;
 
 public interface UserCommandService {
     UserResponseDto.UserDto joinUser(UserRequestDto.JoinDto request);
-    User saveNewUser(String email, UserRequestDto.JoinDto request);
+    UserResponseDto.LoginDto saveNewUser(UserRequestDto.JoinDto request);
+
 
     UserResponseDto.LoginDto isnewUser(String email);
 
