@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
+title: "[타입/#이슈번호] 이슈 내용"
 labels: ''
 assignees: ''
 

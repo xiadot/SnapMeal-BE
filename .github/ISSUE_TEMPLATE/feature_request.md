@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
+title: "[타입/#이슈번호] 이슈 내용"
 labels: ''
 assignees: ''
 
