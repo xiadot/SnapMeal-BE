@@ -10,6 +10,7 @@ public interface UserCommandService {
 
 
     UserResponseDto.LoginDto isnewUser(String email);
+    UserResponseDto.LoginDto signIn(UserRequestDto.SignInRequestDto request);
 
 //    UserResponseDto.userDto getMyUsers();
 //    UserResponseDto.userDto getUsers(Long UserId);

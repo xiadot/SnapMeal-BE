@@ -15,6 +15,8 @@ public enum ErrorCode implements BaseErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON001", "잘못된 입력값입니다."),
 
+    //인증 관련 에러
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "AUTH4010", "인증에 실패했습니다."),
 
     //유저 관련 응답
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"AUTH001" ,"비밀번호가 일치하지 않습니다." ),

@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/", "/home", "/users/sign-up", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs/**", "/users/oauth/kakao").permitAll()
+                        .requestMatchers("/", "/home", "/users/sign-up","/users/sign-in", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs/**", "/users/oauth/kakao/callback").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, blacklistRepository), UsernamePasswordAuthenticationFilter.class);

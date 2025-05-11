@@ -14,6 +14,7 @@ import snapmeal.snapmeal.converter.UserConverter;
 import snapmeal.snapmeal.domain.User;
 import snapmeal.snapmeal.domain.enums.Role;
 import snapmeal.snapmeal.global.code.ErrorCode;
+import snapmeal.snapmeal.global.handler.UserHandler;
 import snapmeal.snapmeal.repository.BlacklistRepository;
 import snapmeal.snapmeal.repository.RefreshTokenRepository;
 import snapmeal.snapmeal.repository.UserRepository;
@@ -101,28 +102,27 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         return UserResponseDto.LoginDto.builder()
                 .tokenServiceResponse(token)
-                .isNewUser(true)  // 신규 유저임을 표시
+                .isNewUser(true)
                 .build();
     }
-    public UserResponseDto.LoginDto signIn(String userId, String password) {
-        Optional<User> existingUser = userRepository.findByUserId(userId);
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            if(!passwordEncoder.matches(password,user.getPassword())){
-                throw new UserDataHandler(ErrorCode.INVALID_PASSWORD);
-            }
-            TokenServiceResponse token = jwtTokenProvider.createToken(user);
-            return UserResponseDto.LoginDto.builder()
-                    .tokenServiceResponse(token)
-                    .isNewUser(false)
-                    .build();
+    public UserResponseDto.LoginDto signIn(UserRequestDto.SignInRequestDto request) {
+        User user = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(() -> new UserHandler(ErrorCode.USER_NOT_FOUND));
 
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new UserHandler(ErrorCode.INVALID_PASSWORD);
         }
+
+        TokenServiceResponse token = jwtTokenProvider.createToken(user);
+        return UserResponseDto.LoginDto.builder()
+                .tokenServiceResponse(token)
+                .isNewUser(false)
+                .build();
     }
 
     private void updateUserData(User user, UserRequestDto.JoinDto request) {
 
-        // 값이 존재하는 경우에만 업데이트
+
         user.updateAll(request);
     }
 
