@@ -1,5 +1,6 @@
 package snapmeal.snapmeal.service;
 
+import ch.qos.logback.core.status.ErrorStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,10 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.UserDataHandler;
 import snapmeal.snapmeal.config.security.JwtTokenProvider;
 import snapmeal.snapmeal.converter.UserConverter;
 import snapmeal.snapmeal.domain.User;
 import snapmeal.snapmeal.domain.enums.Role;
+import snapmeal.snapmeal.global.code.ErrorCode;
 import snapmeal.snapmeal.repository.BlacklistRepository;
 import snapmeal.snapmeal.repository.RefreshTokenRepository;
 import snapmeal.snapmeal.repository.UserRepository;
@@ -101,44 +104,27 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .isNewUser(true)  // 신규 유저임을 표시
                 .build();
     }
+    public UserResponseDto.LoginDto signIn(String userId, String password) {
+        Optional<User> existingUser = userRepository.findByUserId(userId);
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            if(!passwordEncoder.matches(password,user.getPassword())){
+                throw new UserDataHandler(ErrorCode.INVALID_PASSWORD);
+            }
+            TokenServiceResponse token = jwtTokenProvider.createToken(user);
+            return UserResponseDto.LoginDto.builder()
+                    .tokenServiceResponse(token)
+                    .isNewUser(false)
+                    .build();
 
+        }
+    }
 
     private void updateUserData(User user, UserRequestDto.JoinDto request) {
 
         // 값이 존재하는 경우에만 업데이트
         user.updateAll(request);
     }
-
-//
-//    @Override
-//    public UserResponseDto.Userdto getMyUsers() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-//
-//        if(user.getRole() == Role.UNKNOWN){
-//            throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
-//        }
-//
-//        // User 정보를 UserResponseDto로 변환
-//        return UserConverter.toDto(user);
-//    }
-//
-//    @Override
-//    public UserResponseDto.Userdto getUsers(Long UserId) {
-//        User user = userRepository.findById(UserId)
-//                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-//
-//        if(user.getRole() == Role.UNKNOWN){
-//            throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
-//        }
-//
-//        return UserConverter.toDto(user);
-//    }
-//
-//
 
 
 
