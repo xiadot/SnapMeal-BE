@@ -12,6 +12,7 @@ public class UserResponseDto {
     @AllArgsConstructor
     public static class UserDto{
         String name;
+        String userId;
         Integer age;
         Gender gender;
         String email;

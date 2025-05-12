@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "`user`")
+@Table(name = "user")
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +25,9 @@ public class User extends BaseEntity {
 
     @Column(nullable = true)
     private String username;
+
+    @Column(nullable = true)
+    private String userId;
 
     @Column(nullable = true, length = 255)
     private String password;
