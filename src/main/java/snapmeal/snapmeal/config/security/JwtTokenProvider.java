@@ -111,8 +111,11 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         String email = getEmailFromToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
+
 
     public long getExpiration(String token) {
         try {

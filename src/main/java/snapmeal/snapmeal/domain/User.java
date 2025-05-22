@@ -5,12 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import snapmeal.snapmeal.domain.common.BaseEntity;
 import snapmeal.snapmeal.domain.enums.Gender;
 import snapmeal.snapmeal.domain.enums.Role;
 import snapmeal.snapmeal.web.dto.UserRequestDto;
 
 
+import java.util.Collection;
 import java.util.List;
 @Entity
 @Getter
@@ -18,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "user")
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -103,5 +106,24 @@ public class User extends BaseEntity {
         }
     }
 
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+
+    @Override
+    public String getUsername() {
+        return email; // 사용자 식별자로 이메일을 사용
+    }
+    public Long getUserId() {
+        return id;
+    }
 
 }
