@@ -12,14 +12,14 @@ public class UserRequestDto {
     @Setter
     @NoArgsConstructor
     public static class JoinDto {
-        String name;
-        Integer age;
-        Gender gender;
-        String email;
-        String userId;
-        String password;
-        String nickname;
-        String type;
+        private String name;
+        private Integer age;
+        private Gender gender;
+        private String email;
+        private String userId;
+        private String password;
+        private String nickname;
+        private String type;
     }
     @Data
     public static class SignInRequestDto {

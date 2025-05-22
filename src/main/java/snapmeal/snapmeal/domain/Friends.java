@@ -29,4 +29,8 @@ public class Friends extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     private User receiver;
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }
