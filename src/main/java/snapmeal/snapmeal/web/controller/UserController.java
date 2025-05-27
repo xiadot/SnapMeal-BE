@@ -16,6 +16,9 @@ import snapmeal.snapmeal.service.UserCommandService;
 import snapmeal.snapmeal.web.dto.KakaoUserInfoResponseDto;
 import snapmeal.snapmeal.web.dto.UserRequestDto;
 import snapmeal.snapmeal.web.dto.UserResponseDto;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import org.springframework.web.util.UriUtils;
 
 @RestController
 @RequestMapping("/users")
@@ -44,7 +47,12 @@ public class UserController {
         String email = kakaoUser.getKakaoAccount().getEmail();
         UserResponseDto.LoginDto response = userCommandService.isnewUser(email);
 
-        return ResponseEntity.ok(response);
+
+        String jwtToken = response.getTokenServiceResponse().getAccessToken();
+        String encodedToken = UriUtils.encode(jwtToken, StandardCharsets.UTF_8);
+
+        URI redirectUri = URI.create("snapmeal://home?token=" + encodedToken);
+        return ResponseEntity.status(HttpStatus.FOUND).location(redirectUri).build();
     }
     @PostMapping("/sign-up")
     @Operation(

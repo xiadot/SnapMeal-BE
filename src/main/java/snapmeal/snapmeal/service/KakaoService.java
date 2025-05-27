@@ -38,7 +38,7 @@ public class KakaoService {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(BodyInserters.fromFormData("grant_type", "authorization_code")
                         .with("client_id", clientId)
-                        .with("redirect_uri", "http://localhost:8080/api/oauth/kakao/callback")
+                        .with("redirect_uri", "http://api.snapmeal.store/users/oauth/kakao/callback")
                         .with("code", code))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))

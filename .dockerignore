@@ -1,0 +1,20 @@
+# Gradle 관련 캐시
+.gradle
+
+
+# Git
+.git
+.gitignore
+
+# IDE/Editor 설정
+*.iml
+.idea/
+.vscode/
+
+# 로그 파일
+*.log
+
+# 환경파일 (이미 --env-file 로 전달 시)
+.env
+gradle/
+certbot/conf/accounts

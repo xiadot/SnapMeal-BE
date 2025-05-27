@@ -16,6 +16,23 @@ services:
       PASSWORD: "${PASSWORD}"
       URL: "${URL}"
       USERNAME: "${USERNAME}"
+<<<<<<< HEAD
+=======
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis-container
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PORT=6379
+    command: ["redis-server", "--appendonly", "yes"]
+>>>>>>> 2961f0b (refactor: kakao login)
 
   nginx:
     container_name: nginx
@@ -36,8 +53,16 @@ services:
       URL: "${URL}"
       USERNAME: "${USERNAME}"
       SERVER_PORT: 80
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+
+#  certbot:
+#    image: certbot/certbot
+#    volumes:
+#      - ./certbot/conf:/etc/letsencrypt
+#      - ./certbot/www:/var/www/certbot
+#    entrypoint: >
+#      sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
+#      --email jy8294@naver.com --agree-tos --no-eff-email
+#      -d snapmeal.store -d www.snapmeal.store"
+
+volumes:
+  redis_data:

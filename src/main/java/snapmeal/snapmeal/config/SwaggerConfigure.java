@@ -52,6 +52,7 @@ public class SwaggerConfigure {
         return new OpenAPI()
                 .info(info)
                 .addServersItem(new Server().url("http://localhost:8080").description("Local server"))// 서버 URL 설정
+                .addServersItem(new Server().url("http://api.snapmeal.store").description("Production server")) // 서버 URL 설정
                 .addSecurityItem(securityRequirement)
                 .components(components);
     }
