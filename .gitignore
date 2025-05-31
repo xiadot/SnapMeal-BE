@@ -43,3 +43,4 @@ src/main/resources/application.yml
 
 # 환경 설정 파일
 .env
+__pycache__/
