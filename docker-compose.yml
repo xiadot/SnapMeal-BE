@@ -16,10 +16,19 @@ services:
       PASSWORD: "${PASSWORD}"
       URL: "${URL}"
       USERNAME: "${USERNAME}"
-<<<<<<< HEAD
-=======
+
     depends_on:
       - redis
+  fastapi:
+    container_name: fastapi
+    build:
+      context: ./python-snapmeal
+      dockerfile: Dockerfile.fastapi
+    ports:
+      - "8001:8000"
+    restart: always
+    volumes:
+      - ./python-snapmeal:/app
 
   redis:
     container_name: redis-container
@@ -32,7 +41,7 @@ services:
     environment:
       - REDIS_PORT=6379
     command: ["redis-server", "--appendonly", "yes"]
->>>>>>> 2961f0b (refactor: kakao login)
+
 
   nginx:
     container_name: nginx

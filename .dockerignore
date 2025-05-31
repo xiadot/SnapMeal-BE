@@ -18,3 +18,11 @@
 .env
 gradle/
 certbot/conf/accounts
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
+.DS_Store
+.env
