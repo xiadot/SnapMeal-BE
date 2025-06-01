@@ -1,4 +1,9 @@
 spring:
+  port: 8080
+  address: 0.0.0.0
+  openai:
+    api-key: ${API_KEY}
+    model: gpt-4o-mini
   kakao:
     client-id: ${Client_ID}
   docker:
@@ -16,8 +21,8 @@ spring:
 #    import: optional:file:.env[.properties]
   datasource:
     url: ${URL}
-    username: root
-    password: siah0103
+    username: ${USERNAME}
+    password: ${PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
