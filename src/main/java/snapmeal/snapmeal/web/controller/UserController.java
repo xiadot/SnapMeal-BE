@@ -70,10 +70,11 @@ public class UserController {
     @Operation(
             summary = "일반 로그인"
     )
-    @ApiErrorCodeExamples
-    (
+    @ApiErrorCodeExamples({
+            ErrorCode.USER_NOT_FOUND,
             ErrorCode.INVALID_PASSWORD
-    )
+    })
+
     public ResponseEntity<UserResponseDto.LoginDto> singIn(@RequestBody UserRequestDto.SignInRequestDto signInRequestDto) {
         UserResponseDto.LoginDto response = userCommandService.signIn(signInRequestDto);
         return ResponseEntity.ok(response);
