@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import org.springframework.web.multipart.MultipartFile;
 import snapmeal.snapmeal.global.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,11 @@ import snapmeal.snapmeal.global.swagger.ApiErrorCodeExamples;
 import snapmeal.snapmeal.service.FriendCommandService;
 import snapmeal.snapmeal.service.FriendCommandServiceImpl;
 import snapmeal.snapmeal.web.dto.FriendRequestDto;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/friends")

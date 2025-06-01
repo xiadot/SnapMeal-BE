@@ -63,17 +63,17 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(GeneralException.class)
-    public ResponseEntity<Object> onThrowException(GeneralException generalException, HttpServletRequest request) {
+    public ResponseEntity<Object> onThrowException(GeneralException generalException, WebRequest request) {
         ErrorResponseDto errorResponse = generalException.getErrorResponseHttpStatus();
-        return handleExceptionInternal(generalException, errorResponse, null, request);
+        return handleExceptionInternal(generalException, errorResponse, HttpHeaders.EMPTY, request); // ✅ 수정
     }
 
     private ResponseEntity<Object> handleExceptionInternal(Exception e, ErrorResponseDto reason,
-                                                           HttpHeaders headers, HttpServletRequest request) {
+                                                           HttpHeaders headers, WebRequest request) {
         ApiResponse<Object> body = ApiResponse.onFailure(reason.getErrorCode(), reason.getErrorMessage(), null);
-        WebRequest webRequest = new ServletWebRequest(request);
-        return super.handleExceptionInternal(e, body, headers, reason.getHttpStatus(), webRequest);
+        return super.handleExceptionInternal(e, body, headers, reason.getHttpStatus(), request);
     }
+
 
     private ResponseEntity<Object> handleExceptionInternalFalse(Exception e, ErrorCode errorCode,
                                                                 HttpHeaders headers, HttpStatus status,
