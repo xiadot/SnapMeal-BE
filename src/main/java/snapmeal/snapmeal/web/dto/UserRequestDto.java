@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import snapmeal.snapmeal.domain.enums.Gender;
 
+import java.util.List;
+
 public class UserRequestDto {
 
     @Getter
@@ -20,6 +22,7 @@ public class UserRequestDto {
         private String password;
         private String nickname;
         private String type;
+        private List<String> selectedDietTypes;
     }
     @Data
     public static class SignInRequestDto {
