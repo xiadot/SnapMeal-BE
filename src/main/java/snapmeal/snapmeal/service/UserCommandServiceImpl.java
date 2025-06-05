@@ -18,6 +18,7 @@ import snapmeal.snapmeal.global.handler.UserHandler;
 import snapmeal.snapmeal.repository.BlacklistRepository;
 import snapmeal.snapmeal.repository.RefreshTokenRepository;
 import snapmeal.snapmeal.repository.UserRepository;
+import snapmeal.snapmeal.web.dto.DietTypeRequestDto;
 import snapmeal.snapmeal.web.dto.TokenServiceResponse;
 import snapmeal.snapmeal.web.dto.UserRequestDto;
 import snapmeal.snapmeal.web.dto.UserResponseDto;
@@ -34,6 +35,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlacklistRepository blacklistRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DietTypeService dietTypeService;
 
 
     @Override
@@ -48,6 +50,11 @@ public class UserCommandServiceImpl implements UserCommandService {
                     return existingUser;
                 })
                 .orElseGet(() -> {
+                    String tag = dietTypeService.analyzeDietType(
+                            new DietTypeRequestDto(request.getSelectedDietTypes())
+                    ).getDietType();
+
+                    request.setType(tag);
                     User newUser = UserConverter.toUser(request,passwordEncoder);
                     return userRepository.save(newUser);
                 });
