@@ -38,4 +38,5 @@ public class MealsService {
     public void deleteMeal(Long mealId) {
         mealsRepository.deleteById(mealId);
     }
+
 }

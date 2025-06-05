@@ -25,4 +25,8 @@ public class Images extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne(mappedBy = "image", cascade = CascadeType.ALL)
+    private NutritionAnalysis nutritionAnalysis;
+
 }
