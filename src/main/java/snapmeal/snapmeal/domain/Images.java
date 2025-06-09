@@ -29,4 +29,5 @@ public class Images extends BaseEntity {
     @OneToOne(mappedBy = "image", cascade = CascadeType.ALL)
     private NutritionAnalysis nutritionAnalysis;
 
+    private Integer classId;
 }
