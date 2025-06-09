@@ -30,4 +30,8 @@ public class Images extends BaseEntity {
     private NutritionAnalysis nutritionAnalysis;
 
     private Integer classId;
+
+    @Lob
+    @Column(name = "class_name")
+    private String className;
 }

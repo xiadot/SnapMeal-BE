@@ -2,6 +2,7 @@ package snapmeal.snapmeal.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.amazonaws.services.s3.AmazonS3;
@@ -9,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import snapmeal.snapmeal.config.S3Configure;
 import snapmeal.snapmeal.domain.Images;
 import snapmeal.snapmeal.domain.User;
+import snapmeal.snapmeal.global.util.AuthService;
+import snapmeal.snapmeal.global.util.ClassNameMapper;
 import snapmeal.snapmeal.repository.ImageRepository;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,9 +35,14 @@ public class S3UploadService {
     private final S3Configure s3Configure;
     private final ImageRepository imagesRepository;
     private final FastApiProxyService fastApiProxyService;
+    private final AuthService authService;
+    private final StringHttpMessageConverter stringHttpMessageConverter;
 
     @Transactional
-    public PredictionResponseDto uploadPredictAndSave(MultipartFile file, User user) throws IOException {
+    public PredictionResponseDto uploadPredictAndSave(MultipartFile file) throws IOException {
+        // 로그인한 사용자 가져오기
+        User user = authService.getCurrentUser();
+
         // 파일 이름 생성 (UUID-원본파일명)
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
@@ -53,11 +61,15 @@ public class S3UploadService {
         // 예측 서버에 요청
         PredictionResponseDto predictionResponse = fastApiProxyService.sendImageUrlToFastApi(fileUrl);
 
+        // 예측된 classId -> className
+        String className = ClassNameMapper.getClassName(predictionResponse.getClassId());
+
         // 예측 성공 시 DB에 저장
         Images image = Images.builder()
                 .imageUrl(fileUrl)
                 .user(user)   // 로그인한 사용자 정보 저장
                 .classId(predictionResponse.getClassId())
+                .className(className)
                 .build();
 
         imagesRepository.save(image);
