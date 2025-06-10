@@ -1,16 +1,20 @@
 package snapmeal.snapmeal.web.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class PredictionResponseDto {
+    // 예측된 객체별로 생성된 DB 레코드의 ID 리스트
+    private List<Long> imageId;
 
-    @Schema(description = "예측된 클래스 ID", example = "2")
-    @JsonProperty("class_id")
-    private int classId;
+    private List<DetectionDto> detections;
 }

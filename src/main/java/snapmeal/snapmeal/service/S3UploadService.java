@@ -19,13 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import snapmeal.snapmeal.repository.UserRepository;
+import snapmeal.snapmeal.web.dto.DetectionDto;
 import snapmeal.snapmeal.web.dto.PredictionResponseDto;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -61,18 +60,31 @@ public class S3UploadService {
         // 예측 서버에 요청
         PredictionResponseDto predictionResponse = fastApiProxyService.sendImageUrlToFastApi(fileUrl);
 
-        // 예측된 classId -> className
-        String className = ClassNameMapper.getClassName(predictionResponse.getClassId());
+        // 예측 결과에서 모든 detections 리스트 꺼내기
+        List<DetectionDto> detections = predictionResponse.getDetections();
 
-        // 예측 성공 시 DB에 저장
+        // detections가 비어있으면 Unknown 하나로 저장
+        // 엔티티 저장: 대표 정보로 첫 번째 감지 객체 선택(없으면 기본값)
+        int classId = -1;
+        String className = "Unknown";
+        if (detections != null && !detections.isEmpty()) {
+            DetectionDto top = detections.get(0);
+            classId = top.getClassId();
+            className = top.getClassName();
+        }
+
         Images image = Images.builder()
                 .imageUrl(fileUrl)
-                .user(user)   // 로그인한 사용자 정보 저장
-                .classId(predictionResponse.getClassId())
+                .user(user)
+                .classId(classId)
                 .className(className)
                 .build();
 
-        imagesRepository.save(image);
+        Images saved = imagesRepository.save(image);
+
+        // DTO에 ID와 detections 세팅 후 리턴
+        predictionResponse.setImageId(Collections.singletonList(saved.getImgId()));
+        predictionResponse.setDetections(detections);
 
         // 예측 결과 URL 리턴
         return predictionResponse;
