@@ -2,6 +2,7 @@ package snapmeal.snapmeal.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.amazonaws.services.s3.AmazonS3;
@@ -9,20 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 import snapmeal.snapmeal.config.S3Configure;
 import snapmeal.snapmeal.domain.Images;
 import snapmeal.snapmeal.domain.User;
+import snapmeal.snapmeal.global.util.AuthService;
 import snapmeal.snapmeal.repository.ImageRepository;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-import snapmeal.snapmeal.repository.UserRepository;
+import snapmeal.snapmeal.web.dto.DetectionDto;
 import snapmeal.snapmeal.web.dto.PredictionResponseDto;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +27,14 @@ public class S3UploadService {
     private final S3Configure s3Configure;
     private final ImageRepository imagesRepository;
     private final FastApiProxyService fastApiProxyService;
+    private final AuthService authService;
+    private final StringHttpMessageConverter stringHttpMessageConverter;
 
     @Transactional
-    public PredictionResponseDto uploadPredictAndSave(MultipartFile file, User user) throws IOException {
+    public PredictionResponseDto uploadPredictAndSave(MultipartFile file) throws IOException {
+        // 로그인한 사용자 가져오기
+        User user = authService.getCurrentUser();
+
         // 파일 이름 생성 (UUID-원본파일명)
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
@@ -53,14 +53,31 @@ public class S3UploadService {
         // 예측 서버에 요청
         PredictionResponseDto predictionResponse = fastApiProxyService.sendImageUrlToFastApi(fileUrl);
 
-        // 예측 성공 시 DB에 저장
+        // 예측 결과에서 모든 detections 리스트 꺼내기
+        List<DetectionDto> detections = predictionResponse.getDetections();
+
+        // detections가 비어있으면 Unknown 하나로 저장
+        // 엔티티 저장: 대표 정보로 첫 번째 감지 객체 선택(없으면 기본값)
+        int classId = -1;
+        String className = "Unknown";
+        if (detections != null && !detections.isEmpty()) {
+            DetectionDto top = detections.get(0);
+            classId = top.getClassId();
+            className = top.getClassName();
+        }
+
         Images image = Images.builder()
                 .imageUrl(fileUrl)
-                .user(user)   // 로그인한 사용자 정보 저장
-                .classId(predictionResponse.getClassId())
+                .user(user)
+                .classId(classId)
+                .className(className)
                 .build();
 
-        imagesRepository.save(image);
+        Images saved = imagesRepository.save(image);
+
+        // DTO에 ID와 detections 세팅 후 리턴
+        predictionResponse.setImageId(Collections.singletonList(saved.getImgId()));
+        predictionResponse.setDetections(detections);
 
         // 예측 결과 URL 리턴
         return predictionResponse;
