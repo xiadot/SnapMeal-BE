@@ -11,14 +11,7 @@ import snapmeal.snapmeal.config.S3Configure;
 import snapmeal.snapmeal.domain.Images;
 import snapmeal.snapmeal.domain.User;
 import snapmeal.snapmeal.global.util.AuthService;
-import snapmeal.snapmeal.global.util.ClassNameMapper;
 import snapmeal.snapmeal.repository.ImageRepository;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-import snapmeal.snapmeal.repository.UserRepository;
 import snapmeal.snapmeal.web.dto.DetectionDto;
 import snapmeal.snapmeal.web.dto.PredictionResponseDto;
 
