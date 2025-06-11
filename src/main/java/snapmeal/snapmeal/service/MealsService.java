@@ -6,6 +6,7 @@ import snapmeal.snapmeal.domain.Images;
 import snapmeal.snapmeal.domain.Meals;
 import snapmeal.snapmeal.domain.NutritionAnalysis;
 import snapmeal.snapmeal.domain.User;
+import snapmeal.snapmeal.global.util.AuthService;
 import snapmeal.snapmeal.repository.MealsRepository;
 import snapmeal.snapmeal.repository.NutritionAnalysisRepository;
 import snapmeal.snapmeal.web.dto.MealsRequestDto;
@@ -19,8 +20,12 @@ public class MealsService {
 
     private final MealsRepository mealsRepository;
     private final NutritionAnalysisRepository nutritionAnalysisRepository;
+    private final AuthService authService;
+
     // 식단 저장
-    public Meals createMeal(MealsRequestDto request, User user) {
+    public Meals createMeal(MealsRequestDto request) {
+        User user = authService.getCurrentUser();
+
         NutritionAnalysis nutrition = nutritionAnalysisRepository.findById(request.getNutritionId())
                 .orElseThrow(() -> new IllegalArgumentException("영양 분석 정보가 없습니다."));
 
@@ -40,12 +45,14 @@ public class MealsService {
     }
 
     // 사용자의 모든 식단 조회
-    public List<Meals> getAllMeals(User user) {
+    public List<Meals> getAllMeals() {
+        User user = authService.getCurrentUser();
         return mealsRepository.findAllByUser(user);
     }
 
     // 사용자의 식단 개별 조회
-    public Meals getMeal(Long mealId, User user) {
+    public Meals getMeal(Long mealId) {
+        User user = authService.getCurrentUser();
         Meals meal = mealsRepository.findById(mealId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 식단이 없습니다. id=" + mealId));
 
@@ -57,17 +64,16 @@ public class MealsService {
     }
 
     // 식단 수정
-    public Meals updateMeal(Long mealId, MealsRequestDto requestDto, User user) {
-        Meals meal = getMeal(mealId, user);
+    public Meals updateMeal(Long mealId, MealsRequestDto requestDto) {
+        Meals meal = getMeal(mealId);
 
         meal.update(requestDto.getMealType(), requestDto.getMemo(), requestDto.getLocation());
-
         return mealsRepository.save(meal);
     }
 
     // 식단 삭제
-    public void deleteMeal(Long mealId, User user) {
-        Meals meal = getMeal(mealId, user);
+    public void deleteMeal(Long mealId) {
+        Meals meal = getMeal(mealId);
         mealsRepository.delete(meal);
     }
 }

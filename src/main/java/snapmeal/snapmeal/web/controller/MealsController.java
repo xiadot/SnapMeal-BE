@@ -37,9 +37,8 @@ public class MealsController {
     @ApiErrorCodeExamples({
             ErrorCode.BAD_REQUEST
     })
-    public ResponseEntity<ApiResponse<MealsResponseDto>> createMeal(@RequestBody MealsRequestDto request,
-                                                                    @AuthenticationPrincipal User user) {
-        Meals created = mealsService.createMeal(request, user);
+    public ResponseEntity<ApiResponse<MealsResponseDto>> createMeal(@RequestBody MealsRequestDto request) {
+        Meals created = mealsService.createMeal(request);
         MealsResponseDto response = MealsResponseDto.from(created);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.onSuccess(response));
     }
@@ -51,8 +50,8 @@ public class MealsController {
             description = "식사 기록 전체 조회 성공",
             content = @Content(schema = @Schema(implementation = ApiResponse.class))
     )
-    public ResponseEntity<ApiResponse<List<MealsResponseDto>>> getAllMeals(@AuthenticationPrincipal User user) {
-        List<Meals> meals = mealsService.getAllMeals(user);
+    public ResponseEntity<ApiResponse<List<MealsResponseDto>>> getAllMeals() {
+        List<Meals> meals = mealsService.getAllMeals();
         List<MealsResponseDto> responseList = meals.stream()
                 .map(MealsResponseDto::from)
                 .collect(Collectors.toList());
@@ -69,9 +68,8 @@ public class MealsController {
     @ApiErrorCodeExamples({
             ErrorCode.BAD_REQUEST
     })
-    public ResponseEntity<ApiResponse<MealsResponseDto>> getMeal(@PathVariable Long mealId,
-                                                                 @AuthenticationPrincipal User user) {
-        MealsResponseDto meal = MealsResponseDto.from(mealsService.getMeal(mealId, user));
+    public ResponseEntity<ApiResponse<MealsResponseDto>> getMeal(@PathVariable Long mealId) {
+        MealsResponseDto meal = MealsResponseDto.from(mealsService.getMeal(mealId));
         return ResponseEntity.ok(ApiResponse.onSuccess(meal));
     }
 
@@ -88,9 +86,8 @@ public class MealsController {
             ErrorCode.UNAUTHORIZED_ACTION
     })
     public ResponseEntity<ApiResponse<MealsResponseDto>> updateMeal(@PathVariable Long mealId,
-                                                                    @RequestBody MealsRequestDto requestDto,
-                                                                    @AuthenticationPrincipal User user) {
-        Meals updatedMeal = mealsService.updateMeal(mealId, requestDto, user);
+                                                                    @RequestBody MealsRequestDto requestDto) {
+        Meals updatedMeal = mealsService.updateMeal(mealId, requestDto);
         MealsResponseDto response = MealsResponseDto.from(updatedMeal);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
@@ -106,9 +103,8 @@ public class MealsController {
             ErrorCode.BAD_REQUEST,
             ErrorCode.UNAUTHORIZED_ACTION
     })
-    public ResponseEntity<Void> deleteMeal(@PathVariable Long mealId,
-                                           @AuthenticationPrincipal User user) {
-        mealsService.deleteMeal(mealId, user);
+    public ResponseEntity<Void> deleteMeal(@PathVariable Long mealId) {
+        mealsService.deleteMeal(mealId);
         return ResponseEntity.noContent().build();
     }
 
