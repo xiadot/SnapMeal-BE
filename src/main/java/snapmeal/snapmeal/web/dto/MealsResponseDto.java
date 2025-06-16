@@ -21,6 +21,9 @@ public class MealsResponseDto {
     private double sugar;
     private double fat;
 
+    private String className;
+    private String imageUrl;
+
     public static MealsResponseDto from(Meals meal) {
         return MealsResponseDto.builder()
                 .mealId(meal.getMealId())
@@ -33,6 +36,8 @@ public class MealsResponseDto {
                 .carbs(meal.getNutrition().getCarbs())
                 .sugar(meal.getNutrition().getSugar())
                 .fat(meal.getNutrition().getFat())
+                .className(meal.getImage().getClassName())
+                .imageUrl(meal.getImage().getImageUrl())
                 .build();
     }
 }
