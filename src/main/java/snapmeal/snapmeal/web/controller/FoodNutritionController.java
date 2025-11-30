@@ -50,6 +50,18 @@ public class FoodNutritionController {
         return ResponseEntity.ok(result);
     }
 
+<<<<<<< Updated upstream
 
 
+=======
+    @GetMapping("/today")
+    @Operation(
+            summary = "오늘 영양 합계 조회",
+            description = "오늘 기록된 식단의 총 칼로리, 단백질, 탄수화물, 지방, 당류, 나트륨 합계를 반환합니다."
+    )
+    public ResponseEntity<ApiResponse<TodayNutritionResponseDto>> getTodayNutritionSummary() {
+        TodayNutritionResponseDto summary = foodNutritionService.getTodaySummary();
+        return ResponseEntity.ok(ApiResponse.onSuccess(summary));
+    }
+>>>>>>> Stashed changes
 }

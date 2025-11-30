@@ -10,7 +10,12 @@ public class NutritionConverter {
         JSONArray array = new JSONArray(jsonResponse);
 
         int totalCalories = 0;
+<<<<<<< Updated upstream
         double totalProtein = 0,  totalCarbs = 0, totalSugar = 0, totalFat = 0;
+=======
+        double totalProtein = 0, totalCarbs = 0, totalSugar = 0, totalFat = 0, totalSodium = 0;
+
+>>>>>>> Stashed changes
         for (int i = 0; i < array.length(); i++) {
             JSONObject food = array.getJSONObject(i);
             totalCalories += food.optInt("calories", 0);
@@ -18,9 +23,16 @@ public class NutritionConverter {
             totalCarbs += food.optDouble("carbs", 0);
             totalSugar += food.optDouble("sugar", 0);
             totalFat += food.optDouble("fat", 0);
+            totalSodium += food.optDouble("sodium", 0);
         }
 
+<<<<<<< Updated upstream
         return new NutritionRequestDto.TotalNutritionRequestDto(totalCalories, totalProtein, totalCarbs, totalSugar, totalFat, null);
+=======
+        return new NutritionRequestDto.TotalNutritionRequestDto(
+                totalCalories, totalProtein, totalCarbs, totalSugar, totalFat, totalSodium, null
+        );
+>>>>>>> Stashed changes
     }
 
 }

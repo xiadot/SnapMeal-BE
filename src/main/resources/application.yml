@@ -65,11 +65,25 @@ spring:
       enabled: true
   data:
     redis:
+<<<<<<< Updated upstream
       host: redis-container
       #host: localhost
+=======
+#      host: redis-container
+      host: localhost
+>>>>>>> Stashed changes
       port: 6379
   # 사진 최대 업로드 크기 늘리기
   servlet:
     multipart:
+<<<<<<< Updated upstream
       max-file-size: 2MB
       max-request-size: 2MB
+=======
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+food-api:
+  base-url: "https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02"
+  key: "${FOOD_API_KEY}"
+>>>>>>> Stashed changes
